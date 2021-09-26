@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  app:
+    build: ..
+    command: uvicorn app.main:app --host 0.0.0.0 --port 80
+    ports:
+      - 8080:80
+    depends_on:
+      - db
