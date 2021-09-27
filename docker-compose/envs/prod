@@ -1,1 +1,5 @@
 REMOTE_DEBUG=0
+
+DB_NAME=<secret>
+DB_USER=<secret>
+DB_PASSWORD=<secret>
