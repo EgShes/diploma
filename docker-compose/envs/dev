@@ -1,0 +1,5 @@
+REMOTE_DEBUG=1
+
+DB_NAME=texts
+DB_USER=postgres
+DB_PASSWORD=postgres
