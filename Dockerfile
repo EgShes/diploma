@@ -12,5 +12,4 @@ WORKDIR /code
 COPY requirements/dev.txt requirements_dev.txt
 RUN pip install -r requirements_dev.txt
 
-COPY src/database /code/src/database
-COPY config.py /code/config.py
+COPY src/ /code/src/
