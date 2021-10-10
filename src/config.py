@@ -5,14 +5,22 @@ class PyCharmRemoteDebugError(Exception):
     pass
 
 
+class EnvVariableNotDefinedError(Exception):
+    pass
+
+
 class DbConfig:
     db_service = "db"
-    db_name = os.environ.get("DB_NAME", "")
-    db_user = os.environ.get("DB_USER", "")
-    db_password = os.environ.get("DB_PASSWORD", "")
+    db_name = os.environ.get("DB_NAME", None)
+    db_user = os.environ.get("DB_USER", None)
+    db_password = os.environ.get("DB_PASSWORD", None)
 
     @classmethod
     def get_db_url(cls):
+        if cls.db_name is None or cls.db_user is None or cls.db_password is None:
+            raise EnvVariableNotDefinedError(
+                "Some of next envs not defined: DB_NAME, DB_USER, DB_PASSWORD"
+            )
         return f"postgresql://{cls.db_user}:{cls.db_password}@{cls.db_service}/{cls.db_name}"
 
 

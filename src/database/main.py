@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.params import Query
 from sqlmodel import Session, create_engine, select
 
-from config import DbConfig
+from src.config import DbConfig
 from src.database.models import TextRead, TextCreate, Text
 from src.database.utils import create_db_and_tables
 

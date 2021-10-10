@@ -4,8 +4,8 @@ from sqlmodel import Field, SQLModel
 
 
 class TextBase(SQLModel):
-    raw_text: Optional[str]
-    source: Optional[str]
+    raw_text: str
+    source: str
 
 
 class Text(TextBase, table=True):
