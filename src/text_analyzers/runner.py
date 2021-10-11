@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from time import sleep
+from typing import Any, Tuple, Dict
+
+
+Meta = Dict[str, Any]
 
 
 class Preprocessor(ABC):
@@ -41,13 +45,13 @@ class TextProvider(ABC):
         pass
 
     @abstractmethod
-    def __next__(self) -> str:
+    def __next__(self) -> Tuple[str, Meta]:
         pass
 
 
 class ResultPublisher(ABC):
     @abstractmethod
-    def publish(self, result: Any):
+    def publish(self, result: Any, meta: Meta):
         pass
 
 
@@ -63,7 +67,7 @@ class Runner:
         self.preprocessor = preprocessor
         self.analyzer = analyzer
         self.postprocessor = postprocessor
-        self.text_provider = text_provider
+        self.text_provider = iter(text_provider)
         self.result_publisher = result_publisher
 
     def analyze_text(self, text: str):
@@ -74,6 +78,10 @@ class Runner:
 
     def run(self):
         while True:
-            text = next(self.text_provider)
+            try:
+                text, meta = next(self.text_provider)
+            except StopIteration:
+                sleep(10)
+                continue
             result = self.analyze_text(text)
-            self.result_publisher.publish(result)
+            self.result_publisher.publish(result, meta)

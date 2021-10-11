@@ -133,3 +133,5 @@ dmypy.json
 
 # jupyter notebooks
 notebooks/
+
+weights

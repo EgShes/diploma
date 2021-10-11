@@ -36,7 +36,7 @@ def texts(offset: int = 0, limit: int = Query(default=100, lte=100)):
         return texts
 
 
-@app.get("/text/{text_id}", response_model=TextRead)
+@app.get("/text/", response_model=TextRead)
 def read_text(text_id: int):
     with Session(engine) as session:
         text = session.get(Text, text_id)
