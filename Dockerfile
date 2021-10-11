@@ -12,4 +12,6 @@ WORKDIR /code
 COPY requirements/dev.txt requirements_dev.txt
 RUN pip install -r requirements_dev.txt
 
-COPY src/ /code/src/
+COPY src /code/src/
+
+CMD ["uvicorn", "src.database.main:app", "--host", "0.0.0.0", "--port", "8000"]

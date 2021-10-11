@@ -1,5 +1,5 @@
 REMOTE_DEBUG=0
 
-DB_NAME=<secret>
-DB_USER=<secret>
-DB_PASSWORD=<secret>
+POSTGRES_DB=<secret>
+POSTGRES_USER=<secret>
+POSTGRES_PASSWORD=<secret>
