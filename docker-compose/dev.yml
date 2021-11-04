@@ -4,26 +4,28 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
     volumes:
       - postgres_data_diploma:/var/lib/postgresql/data
+
   app:
-    build: ..
-    command: uvicorn src.database.main:app --host 0.0.0.0 --port 8000
+    build:
+      context: ..
     environment:
       - REMOTE_DEBUG
-      - DB_NAME
-      - DB_USER
-      - DB_PASSWORD
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
     ports:
       - 8080:8000
     depends_on:
       - db
+
   adminer:
     image: adminer
-    restart: always
+    restart: unless-stopped
     ports:
       - 8090:8080
     depends_on:

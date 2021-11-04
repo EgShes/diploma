@@ -1,7 +1,7 @@
 REMOTE_DEBUG=1
 
-DB_NAME=texts
-DB_USER=postgres
-DB_PASSWORD=postgres
+POSTGRES_DB=texts
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
 
 COMPOSE_FILE=dev.yml

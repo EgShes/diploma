@@ -8,5 +8,5 @@ Diploma project
 ```bash
 cd docker-compose
 cp envs/dev .env
-COMPOSE_FILE=dev.yml docker-compose up --build
+DOCKER_BUILDKIT=1 docker-compose down && DOCKER_BUILDKIT=1 docker-compose up --build
 ```
