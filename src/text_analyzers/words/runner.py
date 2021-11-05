@@ -1,6 +1,5 @@
 import re
-import string
-from typing import List, Set, Any
+from typing import List, Set
 
 from nltk.corpus import stopwords
 from pymystem3 import Mystem
