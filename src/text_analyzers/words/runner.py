@@ -6,11 +6,11 @@ from pymystem3 import Mystem
 
 from src.text_analyzers.common import RawTextProvider
 from src.text_analyzers.runner import (
-    Preprocessor,
     Analyzer,
-    Postprocessor,
-    ResultPublisher,
     Meta,
+    Postprocessor,
+    Preprocessor,
+    ResultPublisher,
     Runner,
 )
 
@@ -45,11 +45,7 @@ class WordAnalyzer(Analyzer):
         return cls(stemmer, tokens2filter)
 
     def analyze(self, text: str) -> List[str]:
-        return [
-            token.strip()
-            for token in self._stemmer.lemmatize(text)
-            if token.strip() not in self._tokens2filter
-        ]
+        return [token.strip() for token in self._stemmer.lemmatize(text) if token.strip() not in self._tokens2filter]
 
 
 class WordPostprocessor(Postprocessor):
@@ -81,8 +77,6 @@ if __name__ == "__main__":
     text_provider = WordTextProvider(url="http://0.0.0.0:8080/text")
     result_publisher = WordResultPublisher(url="http://0.0.0.0:8080/ner")
 
-    runner = Runner(
-        preprocessor, analyzer, postprocessor, text_provider, result_publisher
-    )
+    runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
 
     runner.run()

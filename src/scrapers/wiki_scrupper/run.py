@@ -1,12 +1,13 @@
 import json
+import logging
+from argparse import ArgumentParser
 from dataclasses import dataclass
 from itertools import count
 from time import sleep
-from tqdm import tqdm
-import requests
-from argparse import ArgumentParser
 
-import logging
+import requests
+from tqdm import tqdm
+
 from src.config import DbConfig
 
 WIKI_RANDOM_PAGE_URL = "https://ru.wikipedia.org/api/rest_v1/page/random/summary"
@@ -64,13 +65,9 @@ if __name__ == "__main__":
             if args.max != -1 and i == args.max:
                 break
         except WikiPageNotAvailableError:
-            logging.warning(
-                f"Could not get random wiki page. Retrying in {TEXT_RETRY_SECONDS}"
-            )
+            logging.warning(f"Could not get random wiki page. Retrying in {TEXT_RETRY_SECONDS}")
             sleep(TEXT_RETRY_SECONDS)
         except TextNotInserted:
-            logging.warning(
-                f"Could not put text to database. Retrying in {TEXT_RETRY_SECONDS}"
-            )
+            logging.warning(f"Could not put text to database. Retrying in {TEXT_RETRY_SECONDS}")
             sleep(TEXT_RETRY_SECONDS)
     logging.info("Finished")

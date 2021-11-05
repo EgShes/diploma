@@ -4,7 +4,7 @@ from typing import Tuple
 import requests
 
 from src.database.models import TextRead
-from src.text_analyzers.runner import TextProvider, Meta
+from src.text_analyzers.runner import Meta, TextProvider
 
 
 class RequestFailedException(Exception):

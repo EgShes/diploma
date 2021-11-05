@@ -1,16 +1,16 @@
 from pathlib import Path
-from typing import List, Dict, Any, Union
+from typing import Any, Dict, List, Union
 
 from dostoevsky.models import FastTextSocialNetworkModel
 from dostoevsky.tokenization import RegexTokenizer
 
 from src.text_analyzers.common import RawTextProvider
 from src.text_analyzers.runner import (
-    Preprocessor,
     Analyzer,
-    Postprocessor,
-    ResultPublisher,
     Meta,
+    Postprocessor,
+    Preprocessor,
+    ResultPublisher,
     Runner,
 )
 from src.text_analyzers.sentiment.schemas import Sentiment
@@ -46,9 +46,7 @@ class SentimentPostprocessor(Postprocessor):
         return cls()
 
     def postprocess(self, analyzer_output: List[Dict[str, float]]) -> Sentiment:
-        sentiment_type, probability = [
-            (key, value) for key, value in analyzer_output[0].items()
-        ][0]
+        sentiment_type, probability = [(key, value) for key, value in analyzer_output[0].items()][0]
         return Sentiment(probability=probability, type=sentiment_type)
 
 
@@ -72,8 +70,6 @@ if __name__ == "__main__":
     text_provider = SentimentTextProvider(url="http://0.0.0.0:8080/text")
     result_publisher = SentimentResultPublisher(url="http://0.0.0.0:8080/ner")
 
-    runner = Runner(
-        preprocessor, analyzer, postprocessor, text_provider, result_publisher
-    )
+    runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
 
     runner.run()
