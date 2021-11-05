@@ -61,7 +61,6 @@ class SentimentResultPublisher(ResultPublisher):
         self._url = url
 
     def publish(self, result: str, meta: Meta):
-        print(result)
         pass
 
 
