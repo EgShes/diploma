@@ -1,34 +1,20 @@
-import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
 
-import requests
 from navec import Navec
 from slovnet import NER
 from slovnet.markup import SpanMarkup
 
-from src.database.models import TextRead
+from src.text_analyzers.common import RawTextProvider
 from src.text_analyzers.ner.schemas import NamedEntity, NerOutputSchema
 from src.text_analyzers.runner import (
     Preprocessor,
     Analyzer,
     Postprocessor,
-    TextProvider,
     ResultPublisher,
     Runner,
     Meta,
 )
-
-
-@dataclass
-class NerTextProviderOutput:
-    text: str
-    id: int
-
-
-class RequestFailedException(Exception):
-    pass
 
 
 class NerPreprocessor(Preprocessor):
@@ -71,27 +57,8 @@ class NerPostprocessor(Postprocessor):
         return NerOutputSchema(entities=entities)
 
 
-class NerTextProvider(TextProvider):
-    def __init__(self, url: str):
-        self._url = url
-
-    def __iter__(self):
-        self._counter = 1
-        return self
-
-    def __next__(self) -> Tuple[str, Meta]:
-        try:
-            response = requests.get(self._url, params={"text_id": self._counter})
-            self._counter += 1
-            if response.status_code != 200:
-                raise RequestFailedException(
-                    f'Got response code {response.status_code} with message {response.content.decode("utf-8")}'
-                )
-            data = TextRead.parse_raw(response.content)
-            return data.raw_text, {"id": data.id}
-        except Exception as e:
-            logging.error(e)
-            raise StopIteration from e
+class NerTextProvider(RawTextProvider):
+    pass
 
 
 class NerResultPublisher(ResultPublisher):
