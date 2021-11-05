@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from time import sleep
-from typing import Any, Tuple, Dict
-
+from typing import Any, Dict, Tuple
 
 Meta = Dict[str, Any]
 

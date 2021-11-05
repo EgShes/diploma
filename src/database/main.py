@@ -5,7 +5,7 @@ from fastapi.params import Query
 from sqlmodel import Session, create_engine, select
 
 from src.config import DbConfig
-from src.database.models import TextRead, TextCreate, Text
+from src.database.models import Text, TextCreate, TextRead
 from src.database.utils import create_db_and_tables
 
 engine = create_engine(DbConfig.get_db_url())

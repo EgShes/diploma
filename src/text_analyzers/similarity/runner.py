@@ -8,11 +8,11 @@ from sentence_transformers import SentenceTransformer
 
 from src.text_analyzers.common import RawTextProvider
 from src.text_analyzers.runner import (
-    Preprocessor,
     Analyzer,
-    Postprocessor,
-    ResultPublisher,
     Meta,
+    Postprocessor,
+    Preprocessor,
+    ResultPublisher,
     Runner,
 )
 
@@ -37,9 +37,7 @@ class SimilarityPreprocessor(Preprocessor):
 
 class SimilarityAnalyzer(Analyzer):
     def __init__(self, model_name: str, device: str, weights_folder):
-        self._model = SentenceTransformer(
-            model_name_or_path=model_name, device=device, cache_folder=weights_folder
-        )
+        self._model = SentenceTransformer(model_name_or_path=model_name, device=device, cache_folder=weights_folder)
 
     @classmethod
     def load(cls, weight_folder: Union[str, Path], device: str = "cpu"):
@@ -78,15 +76,11 @@ class SimilarityResultPublisher(ResultPublisher):
 if __name__ == "__main__":
 
     preprocessor = SimilarityPreprocessor()
-    analyzer = SimilarityAnalyzer.load(
-        weight_folder="/home/egor/.cache/torch/sentence_transformers"
-    )
+    analyzer = SimilarityAnalyzer.load(weight_folder="/home/egor/.cache/torch/sentence_transformers")
     postprocessor = SimilarityPostprocessor()
     text_provider = SimilarityTextProvider(url="http://0.0.0.0:8080/text")
     result_publisher = SimilarityResultPublisher(url="http://0.0.0.0:8080/ner")
 
-    runner = Runner(
-        preprocessor, analyzer, postprocessor, text_provider, result_publisher
-    )
+    runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
 
     runner.run()

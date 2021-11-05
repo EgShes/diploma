@@ -32,8 +32,6 @@ if Config.remote_debug_enabled:
     import pydevd_pycharm
 
     try:
-        pydevd_pycharm.settrace(
-            "172.17.0.1", port=12345, stdoutToServer=True, stderrToServer=True
-        )
+        pydevd_pycharm.settrace("172.17.0.1", port=12345, stdoutToServer=True, stderrToServer=True)
     except ConnectionRefusedError as e:
         raise PyCharmRemoteDebugError("Could not connect to remote server") from e

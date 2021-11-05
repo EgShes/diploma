@@ -8,12 +8,12 @@ from slovnet.markup import SpanMarkup
 from src.text_analyzers.common import RawTextProvider
 from src.text_analyzers.ner.schemas import NamedEntity, NerOutputSchema
 from src.text_analyzers.runner import (
-    Preprocessor,
     Analyzer,
+    Meta,
     Postprocessor,
+    Preprocessor,
     ResultPublisher,
     Runner,
-    Meta,
 )
 
 
@@ -49,11 +49,7 @@ class NerPostprocessor(Postprocessor):
     def postprocess(self, analyzer_output: SpanMarkup) -> NerOutputSchema:
         entities = []
         for span in analyzer_output.spans:
-            entities.append(
-                NamedEntity(
-                    text=analyzer_output.text[span.start : span.stop], type=span.type
-                )
-            )
+            entities.append(NamedEntity(text=analyzer_output.text[span.start : span.stop], type=span.type))
         return NerOutputSchema(entities=entities)
 
 
@@ -79,8 +75,6 @@ if __name__ == "__main__":
     text_provider = NerTextProvider(url="http://0.0.0.0:8080/text")
     result_publisher = NerResultPublisher(url="http://0.0.0.0:8080/ner")
 
-    ner_runner = Runner(
-        preprocessor, analyzer, postprocessor, text_provider, result_publisher
-    )
+    ner_runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
 
     ner_runner.run()
