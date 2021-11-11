@@ -1,45 +1,39 @@
 from typing import List
 
 from fastapi import FastAPI, HTTPException
-from fastapi.params import Query
-from sqlmodel import Session, create_engine, select
+from fastapi.params import Depends
+from sqlalchemy.orm import Session
 
-from src.config import DbConfig
-from src.database.models import Text, TextCreate, TextRead
-from src.database.utils import create_db_and_tables
+from src.database import crud, models, schemas
+from src.database.database import SessionLocal, engine
 
-engine = create_engine(DbConfig.get_db_url())
+models.Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI()
 
 
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables(engine)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
-@app.post("/add_text/", response_model=TextRead)
-def add_text(text: TextCreate):
-    with Session(engine) as session:
-        db_text = Text.from_orm(text)
-        session.add(db_text)
-        session.commit()
-        session.refresh(db_text)
-        return db_text
+@app.post("/add_text/", response_model=schemas.SourceText)
+def add_text(text: schemas.SourceTextCreate, db: Session = Depends(get_db)):
+    return crud.create_source_text(db=db, source_text=text)
 
 
-@app.get("/texts/", response_model=List[TextRead])
-def texts(offset: int = 0, limit: int = Query(default=100, lte=100)):
-    with Session(engine) as session:
-        texts = session.exec(select(Text).offset(offset).limit(limit)).all()
-        return texts
+@app.get("/text/", response_model=schemas.SourceText)
+def read_text(text_id: int, db: Session = Depends(get_db)):
+    source_text = crud.get_source_text(db, id_=text_id)
+    if source_text is None:
+        raise HTTPException(status_code=404, detail="Text not found")
+    return source_text
 
 
-@app.get("/text/", response_model=TextRead)
-def read_text(text_id: int):
-    with Session(engine) as session:
-        text = session.get(Text, text_id)
-        if not text:
-            raise HTTPException(status_code=404, detail="Text not found")
-        return text
+@app.get("/texts/", response_model=List[schemas.SourceText])
+def read_texts(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return crud.get_texts(db, skip=skip, limit=limit)
