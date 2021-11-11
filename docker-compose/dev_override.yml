@@ -1,0 +1,12 @@
+services:
+  db:
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 8090:8080
+    depends_on:
+      - db
