@@ -1,20 +1,27 @@
-from typing import Optional
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
-from sqlmodel import Field, SQLModel
-
-
-class TextBase(SQLModel):
-    raw_text: str
-    source: str
+from src.database.database import Base
 
 
-class Text(TextBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class SourceText(Base):
+    __tablename__ = "source_text"
+
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String)
+    source = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    named_entities = relationship("NamedEntity", back_populates="source_text")
 
 
-class TextCreate(TextBase):
-    pass
+class NamedEntity(Base):
+    __tablename__ = "named_entity"
 
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String)
+    source_text_id = Column(Integer, ForeignKey("source_text.id"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-class TextRead(TextBase):
-    id: int
+    source_text = relationship("SourceText", back_populates="named_entities")
