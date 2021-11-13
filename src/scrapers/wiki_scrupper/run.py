@@ -8,8 +8,6 @@ from time import sleep
 import requests
 from tqdm import tqdm
 
-from src.config import DbConfig
-
 WIKI_RANDOM_PAGE_URL = "https://ru.wikipedia.org/api/rest_v1/page/random/summary"
 TEXT_RETRY_SECONDS = 1
 
