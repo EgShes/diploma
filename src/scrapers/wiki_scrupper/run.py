@@ -35,10 +35,9 @@ def get_random_page() -> WikiText:
 
 
 def post_text(wiki_text: WikiText, url: str):
-    response = requests.post(url, json={"raw_text": wiki_text.text, "source": "wiki"})
+    response = requests.post(url, json={"text": wiki_text.text, "source": "wiki"})
     if response.status_code != 200:
         raise TextNotInserted
-    return
 
 
 if __name__ == "__main__":
