@@ -1,0 +1,24 @@
+FROM python:3.8 as base
+
+RUN apt update && apt upgrade -y
+RUN pip install --upgrade pip
+
+COPY requirements/analizers requirements
+RUN pip install -r requirements/common.txt \
+    && pip install -r requirements/ner.txt
+
+WORKDIR /app
+COPY weights/ner /app/weights/ner
+COPY src/text_analyzers /app/src/text_analyzers
+COPY src/config.py /app/src/config.py
+
+FROM base as prod
+
+CMD ["python", "-m", "src.text_analyzers.ner.run"]
+
+FROM base as dev
+
+COPY requirements/dev.txt requirements_dev.txt
+RUN pip install -r requirements_dev.txt
+
+CMD ["python", "-m", "src.text_analyzers.ner.run"]

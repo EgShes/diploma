@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import requests
 from navec import Navec
 from slovnet import NER
 from slovnet.markup import SpanMarkup
@@ -12,7 +13,6 @@ from src.text_analyzers.runner import (
     Postprocessor,
     Preprocessor,
     ResultPublisher,
-    Runner,
 )
 
 
@@ -60,20 +60,6 @@ class NerResultPublisher(ResultPublisher):
     def __init__(self, url: str):
         self._url = url
 
-    def publish(self, result: str, meta: Meta):
-        pass
-
-
-if __name__ == "__main__":
-    preprocessor = NerPreprocessor()
-    analyzer = NerAnalyzer.load(
-        Path("weights/navec_news_v1_1B_250K_300d_100q.tar"),
-        Path("weights/slovnet_ner_news_v1.tar"),
-    )
-    postprocessor = NerPostprocessor()
-    text_provider = NerTextProvider(url="http://0.0.0.0:8080/text")
-    result_publisher = NerResultPublisher(url="http://0.0.0.0:8080/ner")
-
-    ner_runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
-
-    ner_runner.run()
+    def publish(self, result: NerOutputSchema, meta: Meta):
+        for named_entity in result.entities:
+            requests.post(self._url, params={"text_id": meta["id"]}, json=named_entity.dict())

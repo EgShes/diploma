@@ -2,13 +2,19 @@ import logging
 from typing import Tuple
 
 import requests
+from pydantic import BaseModel
 
-from src.database.models import TextRead
 from src.text_analyzers.runner import Meta, TextProvider
 
 
 class RequestFailedException(Exception):
     pass
+
+
+class SourceText(BaseModel):
+    id: int
+    text: str
+    source: str
 
 
 class RawTextProvider(TextProvider):
@@ -27,8 +33,8 @@ class RawTextProvider(TextProvider):
                 raise RequestFailedException(
                     f'Got response code {response.status_code} with message {response.content.decode("utf-8")}'
                 )
-            data = TextRead.parse_raw(response.content)
-            return data.raw_text, {"id": data.id}
+            data = SourceText.parse_raw(response.content)
+            return data.text, {"id": data.id}
         except Exception as e:
             logging.error(e)
             raise StopIteration from e
