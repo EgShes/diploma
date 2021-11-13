@@ -3,7 +3,10 @@ from pathlib import Path
 from src.text_analyzers.ner.runner import NerAnalyzer, NerPostprocessor, NerPreprocessor
 
 if __name__ == "__main__":
-    text = """Кипиево — село в Ижемском районе Республики Коми (Россия). Административный центр одноимённого сельского поселения."""
+    text = (
+        "Кипиево — село в Ижемском районе Республики Коми (Россия). "
+        "Административный центр одноимённого сельского поселения."
+    )
 
     pre = NerPreprocessor.load()
     anal = NerAnalyzer.load(
