@@ -37,3 +37,8 @@ def read_text(text_id: int, db: Session = Depends(get_db)):
 @app.get("/texts/", response_model=List[schemas.SourceText])
 def read_texts(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_texts(db, skip=skip, limit=limit)
+
+
+@app.post("/named_entity", response_model=schemas.NamedEntity)
+def create_named_entity_for_text(text_id: int, named_entity: schemas.NamedEntityCreate, db: Session = Depends(get_db)):
+    return crud.create_named_entity(db, source_text_id=text_id, named_entity=named_entity)
