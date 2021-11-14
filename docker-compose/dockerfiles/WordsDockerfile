@@ -5,10 +5,10 @@ RUN pip install --upgrade pip
 
 COPY requirements/analizers requirements
 RUN pip install -r requirements/common.txt \
-    && pip install -r requirements/ner.txt
+    && pip install -r requirements/words.txt
 
 WORKDIR /app
-COPY weights/ner /app/weights/ner
+COPY weights/words /usr/local/nltk_data
 
 FROM base as prod
 
@@ -17,11 +17,11 @@ COPY src/config.py /app/src/config.py
 COPY src/logger.py /app/src/logger.py
 COPY src/loggers.conf /app/src/loggers.conf
 
-CMD ["python", "-m", "src.text_analyzers.ner.run"]
+CMD ["python", "-m", "src.text_analyzers.words.run"]
 
 FROM base as dev
 
 COPY requirements/dev.txt requirements_dev.txt
 RUN pip install -r requirements_dev.txt
 
-CMD ["python", "-m", "src.text_analyzers.ner.run"]
+CMD ["python", "-m", "src.text_analyzers.words.run"]

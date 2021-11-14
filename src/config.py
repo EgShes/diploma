@@ -30,4 +30,6 @@ class DbConfig:
 loggers_config_path = Path(__file__).parent / "loggers.conf"
 
 app_logger = Logger.from_config("app_logger", loggers_config_path)
+ner_logger = Logger.from_config("ner_logger", loggers_config_path)
+words_logger = Logger.from_config("words_logger", loggers_config_path)
 dev_logger = Logger.from_config("development_logger", loggers_config_path)

@@ -1,6 +1,6 @@
-import logging
 from pathlib import Path
 
+from src.config import ner_logger
 from src.text_analyzers.ner.runner import (
     NerAnalyzer,
     NerPostprocessor,
@@ -22,5 +22,5 @@ if __name__ == "__main__":
 
     ner_runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
 
-    logging.info("Working")
+    ner_logger.info("Successfully loaded")
     ner_runner.run()
