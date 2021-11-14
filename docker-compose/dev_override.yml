@@ -41,3 +41,11 @@ services:
       - envs/dev
     volumes:
       - ../src:/app/src
+
+  sentiment:
+    build:
+      target: dev
+    env_file:
+      - envs/dev
+    volumes:
+      - ../src:/app/src

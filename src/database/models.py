@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, Enum, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -13,24 +13,33 @@ class EntityType(str, enum.Enum):
     organization = "ORG"
 
 
+class SentimentType(str, enum.Enum):
+    positive = "positive"
+    negative = "negative"
+    neutral = "neutral"
+    skip = "skip"
+    speech = "speech"
+
+
 class SourceText(Base):
     __tablename__ = "source_text"
 
     id = Column(Integer, primary_key=True, index=True)
-    text = Column(String)
-    source = Column(String)
+    text = Column(String, nullable=False)
+    source = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     named_entities = relationship("NamedEntity", back_populates="source_text")
     words = relationship("SourceTextWordAssociation", back_populates="source_text")
+    sentiments = relationship("Sentiment", back_populates="source_text")
 
 
 class NamedEntity(Base):
     __tablename__ = "named_entity"
 
     id = Column(Integer, primary_key=True, index=True)
-    text = Column(String)
-    type = Column(Enum(EntityType))
+    text = Column(String, nullable=False)
+    type = Column(Enum(EntityType), nullable=False)
     source_text_id = Column(Integer, ForeignKey("source_text.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -52,7 +61,19 @@ class Word(Base):
     __tablename__ = "word"
 
     id = Column(Integer, primary_key=True, index=True)
-    text = Column(String, unique=True)
+    text = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     source_texts = relationship("SourceTextWordAssociation", back_populates="word")
+
+
+class Sentiment(Base):
+    __tablename__ = "sentiment"
+
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(Enum(SentimentType), nullable=False)
+    probability = Column(Float, nullable=False)
+    source_text_id = Column(Integer, ForeignKey("source_text.id"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    source_text = relationship("SourceText", back_populates="sentiments")

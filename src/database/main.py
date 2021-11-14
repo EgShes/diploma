@@ -5,7 +5,6 @@ from fastapi.params import Depends
 from sqlalchemy.orm import Session
 
 from src.database import crud, models, schemas
-from src.database.crud import AlreadyExistsError
 from src.database.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
@@ -52,7 +51,12 @@ def create_word_for_text(text_id: int, word: schemas.WordCreate, db: Session = D
         raise HTTPException(status_code=404, detail=f"Text with id {text_id} not found")
     try:
         association = crud.create_word(db, source_text_id=text_id, word=word)
-    except AlreadyExistsError as e:
+    except crud.AlreadyExistsError as e:
         raise HTTPException(403, detail=e.args)
     association.word.source_text_id = association.source_text_id
     return schemas.Word.from_orm(association.word)
+
+
+@app.post("/sentiment", response_model=schemas.Sentiment)
+def create_sentiment_for_text(text_id: int, sentiment: schemas.SentimentCreate, db: Session = Depends(get_db)):
+    return crud.create_sentiment(db, source_text_id=text_id, sentiment=sentiment)
