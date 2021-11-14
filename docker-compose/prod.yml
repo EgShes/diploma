@@ -28,7 +28,18 @@ services:
       dockerfile: docker-compose/dockerfiles/NerDockerfile
       target: prod
     env_file:
-      - .env
+      - envs/prod
+    depends_on:
+      db:
+        condition: service_healthy
+
+  words:
+    build:
+      context: ..
+      dockerfile: docker-compose/dockerfiles/WordsDockerfile
+      target: prod
+    env_file:
+      - envs/prod
     depends_on:
       db:
         condition: service_healthy

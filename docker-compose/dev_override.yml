@@ -21,8 +21,23 @@ services:
     ports:
       - 8080:8000
     volumes:
-      - ../src:/app/src
+      - ../src/database:/app/src/database
+      - ../src/config.py:/app/src/config.py
+      - ../src/logger.py:/app/src/logger.py
+      - ../src/loggers.conf:/app/src/loggers.conf
 
   ner:
     build:
       target: dev
+    env_file:
+      - envs/dev
+    volumes:
+      - ../src:/app/src
+
+  words:
+    build:
+      target: dev
+    env_file:
+      - envs/dev
+    volumes:
+      - ../src:/app/src

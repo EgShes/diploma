@@ -1,7 +1,10 @@
 import re
+from collections import Counter
 from typing import List, Set
 
+import requests
 from nltk.corpus import stopwords
+from pydantic import BaseModel
 from pymystem3 import Mystem
 
 from src.text_analyzers.common import RawTextProvider
@@ -11,8 +14,12 @@ from src.text_analyzers.runner import (
     Postprocessor,
     Preprocessor,
     ResultPublisher,
-    Runner,
 )
+
+
+class WordSchema(BaseModel):
+    text: str
+    quantity: int
 
 
 class WordPreprocessor(Preprocessor):
@@ -53,8 +60,8 @@ class WordPostprocessor(Postprocessor):
     def load(cls, *args, **kwargs):
         return cls()
 
-    def postprocess(self, analyzer_output: List[str]):
-        return analyzer_output
+    def postprocess(self, analyzer_output: List[str]) -> List[WordSchema]:
+        return [WordSchema(text=word, quantity=count) for word, count in Counter(analyzer_output).items()]
 
 
 class WordTextProvider(RawTextProvider):
@@ -65,18 +72,6 @@ class WordResultPublisher(ResultPublisher):
     def __init__(self, url: str):
         self._url = url
 
-    def publish(self, result: str, meta: Meta):
-        pass
-
-
-if __name__ == "__main__":
-
-    preprocessor = WordPreprocessor()
-    analyzer = WordAnalyzer.load()
-    postprocessor = WordPostprocessor()
-    text_provider = WordTextProvider(url="http://0.0.0.0:8080/text")
-    result_publisher = WordResultPublisher(url="http://0.0.0.0:8080/ner")
-
-    runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
-
-    runner.run()
+    def publish(self, result: List[WordSchema], meta: Meta):
+        for word in result:
+            requests.post(self._url, params={"text_id": meta["id"]}, json=word.dict())
