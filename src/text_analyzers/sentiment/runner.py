@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Dict, List, Union
 
+import requests
 from dostoevsky.models import FastTextSocialNetworkModel
 from dostoevsky.tokenization import RegexTokenizer
 
@@ -11,7 +12,6 @@ from src.text_analyzers.runner import (
     Postprocessor,
     Preprocessor,
     ResultPublisher,
-    Runner,
 )
 from src.text_analyzers.sentiment.schemas import Sentiment
 
@@ -58,18 +58,5 @@ class SentimentResultPublisher(ResultPublisher):
     def __init__(self, url: str):
         self._url = url
 
-    def publish(self, result: str, meta: Meta):
-        pass
-
-
-if __name__ == "__main__":
-
-    preprocessor = SentimentPreprocessor()
-    analyzer = SentimentAnalyzer.load(Path("/tmp/fasttext-social-network-model.bin"))
-    postprocessor = SentimentPostprocessor()
-    text_provider = SentimentTextProvider(url="http://0.0.0.0:8080/text")
-    result_publisher = SentimentResultPublisher(url="http://0.0.0.0:8080/ner")
-
-    runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
-
-    runner.run()
+    def publish(self, result: Sentiment, meta: Meta):
+        requests.post(self._url, params={"text_id": meta["id"]}, json=result.dict())

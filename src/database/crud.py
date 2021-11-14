@@ -59,3 +59,16 @@ def create_word(db: Session, source_text_id: int, word: schemas.WordCreate) -> m
         raise AlreadyExistsError("Data you are trying to insert already exists") from e
     dev_logger.debug("Successfully added a word")
     return association
+
+
+# sentiment
+
+
+def create_sentiment(db: Session, source_text_id: int, sentiment: schemas.SentimentCreate) -> models.Sentiment:
+    db_sentiment = models.Sentiment(
+        type=sentiment.type, probability=sentiment.probability, source_text_id=source_text_id
+    )
+    db.add(db_sentiment)
+    db.commit()
+    db.refresh(db_sentiment)
+    return db_sentiment

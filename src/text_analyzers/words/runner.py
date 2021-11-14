@@ -1,5 +1,6 @@
 import re
 from collections import Counter
+from pathlib import Path
 from typing import List, Set
 
 import requests
@@ -46,7 +47,9 @@ class WordAnalyzer(Analyzer):
         self._tokens2filter = tokens2filter
 
     @classmethod
-    def load(cls, *args, **kwargs):
+    def load(cls, mystem_path: Path):
+        # stemmer = Mystem(str(mystem_path))
+        # TODO fix it
         stemmer = Mystem()
         tokens2filter = set(stopwords.words("russian") + [""])
         return cls(stemmer, tokens2filter)

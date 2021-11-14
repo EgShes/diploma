@@ -44,5 +44,16 @@ services:
       db:
         condition: service_healthy
 
+  sentiment:
+    build:
+      context: ..
+      dockerfile: docker-compose/dockerfiles/SentimentDockerfile
+      target: prod
+    env_file:
+      - envs/prod
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_data_diploma:

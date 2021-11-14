@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from src.database.models import EntityType
+from src.database.models import EntityType, SentimentType
 
 # named entity
 
@@ -58,6 +58,26 @@ class SourceTextCreate(SourceTextBase):
 class SourceText(SourceTextBase):
     id: int
     named_entities: List[NamedEntity]
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+# sentiment
+
+
+class SentimentBase(BaseModel):
+    type: SentimentType
+    probability: float
+
+
+class SentimentCreate(SentimentBase):
+    pass
+
+
+class Sentiment(SentimentBase):
+    id: int
     created_at: datetime
 
     class Config:
