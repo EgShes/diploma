@@ -1,0 +1,25 @@
+FROM python:3.8 as base
+
+RUN apt update && apt upgrade -y
+RUN pip install --upgrade pip
+
+COPY requirements/database.txt requirements.txt
+RUN pip install -r requirements.txt
+
+WORKDIR /app
+
+FROM base as prod
+
+COPY src/database /app/src/database
+COPY src/config.py /app/src/config.py
+COPY src/logger.py /app/src/logger.py
+COPY src/loggers.conf /app/src/loggers.conf
+
+CMD ["uvicorn", "src.database.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+FROM base as dev
+
+COPY requirements/dev.txt requirements_dev.txt
+RUN pip install -r requirements_dev.txt
+
+CMD ["uvicorn", "src.database.main:app", "--debug", "--reload", "--host", "0.0.0.0", "--port", "8000"]

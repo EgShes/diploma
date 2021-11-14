@@ -16,11 +16,10 @@ services:
   app:
     build:
       context: ..
-    environment:
-      - REMOTE_DEBUG
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
+      dockerfile: docker-compose/dockerfiles/AppDockerfile
+      target: prod
+    env_file:
+      - envs/prod
     depends_on:
       db:
         condition: service_healthy
