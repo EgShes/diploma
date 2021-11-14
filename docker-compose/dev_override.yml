@@ -1,5 +1,7 @@
 services:
   db:
+    env_file:
+      - envs/dev
     ports:
       - 5432:5432
 

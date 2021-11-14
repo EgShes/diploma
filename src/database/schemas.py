@@ -5,6 +5,8 @@ from pydantic import BaseModel
 
 from src.database.models import EntityType
 
+# named entity
+
 
 class NamedEntityBase(BaseModel):
     text: str
@@ -22,6 +24,26 @@ class NamedEntity(NamedEntityBase):
 
     class Config:
         orm_mode = True
+
+
+class WordBase(BaseModel):
+    text: str
+
+
+class WordCreate(WordBase):
+    quantity: int
+
+
+class Word(WordBase):
+    id: int
+    created_at: datetime
+    source_text_id: int
+
+    class Config:
+        orm_mode = True
+
+
+# source text
 
 
 class SourceTextBase(BaseModel):

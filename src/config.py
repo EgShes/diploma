@@ -27,10 +27,6 @@ class DbConfig:
         return f"postgresql://{cls.db_user}:{cls.db_password}@{cls.db_service}/{cls.db_name}"
 
 
-class Config:
-    remote_debug_enabled = os.environ.get("REMOTE_DEBUG", 0) == "1"
-
-
 loggers_config_path = Path(__file__).parent / "loggers.conf"
 
 app_logger = Logger.from_config("app_logger", loggers_config_path)
