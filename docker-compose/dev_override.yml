@@ -12,8 +12,14 @@ services:
       - db
 
   app:
+    build:
+      target: dev
+    env_file:
+      - envs/dev
     ports:
       - 8080:8000
+    volumes:
+      - ../src:/app/src
 
   ner:
     build:
