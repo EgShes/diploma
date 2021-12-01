@@ -1,0 +1,52 @@
+exchanges:
+  - name: input
+    durable: true
+    type: direct
+  - name: dead-letter
+    durable: true
+    type: direct
+
+queues:
+  - name: ner
+    durable: true
+    arguments:
+      x-dead-letter-exchange: dead-letter
+      x-dead-letter-routing-key: ner
+  - name: sentiment
+    durable: true
+    arguments:
+      x-dead-letter-exchange: dead-letter
+      x-dead-letter-routing-key: sentiment
+  - name: word
+    durable: true
+    arguments:
+      x-dead-letter-exchange: dead-letter
+      x-dead-letter-routing-key: word
+
+  - name: ner-dead-letter
+    durable: true
+  - name: sentiment-dead-letter
+    durable: true
+  - name: word-dead-letter
+    durable: true
+
+bindings:
+  - exchange: input
+    queue: ner
+    routing_key: ner
+  - exchange: input
+    queue: sentiment
+    routing_key: sentiment
+  - exchange: input
+    queue: word
+    routing_key: word
+
+  - exchange: dead-letter
+    queue: ner-dead-letter
+    routing_key: ner
+  - exchange: dead-letter
+    queue: sentiment-dead-letter
+    routing_key: sentiment
+  - exchange: dead-letter
+    queue: word-dead-letter
+    routing_key: word
