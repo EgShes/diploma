@@ -11,6 +11,16 @@ services:
     volumes:
       - postgres_data_diploma:/var/lib/postgresql/data
 
+  queue:
+    image: rabbitmq:3.9-alpine
+    env_file:
+      - envs/prod
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
   app:
     build:
       context: ..
@@ -32,6 +42,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      queue:
+        condition: service_healthy
 
   words:
     build:
@@ -43,6 +55,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      queue:
+        condition: service_healthy
 
   sentiment:
     build:
@@ -53,6 +67,8 @@ services:
       - envs/prod
     depends_on:
       db:
+        condition: service_healthy
+      queue:
         condition: service_healthy
 
 volumes:
