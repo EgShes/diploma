@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 from pydantic import BaseModel
 
@@ -57,7 +56,6 @@ class SourceTextCreate(SourceTextBase):
 
 class SourceText(SourceTextBase):
     id: int
-    named_entities: List[NamedEntity]
     created_at: datetime
 
     class Config:
