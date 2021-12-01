@@ -5,6 +5,12 @@ services:
     ports:
       - 5432:5432
 
+  queue:
+    env_file:
+      - envs/dev
+    ports:
+      - 5671:15672
+
   adminer:
     image: adminer
     restart: unless-stopped
