@@ -6,10 +6,11 @@ services:
       - 5432:5432
 
   queue:
+    image: rabbitmq:management
     env_file:
       - envs/dev
     ports:
-      - 5671:15672
+      - 15672:15672
 
   adminer:
     image: adminer
