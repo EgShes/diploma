@@ -9,6 +9,16 @@ class AlreadyExistsError(Exception):
     pass
 
 
+# processing status
+
+
+def create_processing_status(db: Session, id_: int):
+    for Model in [models.WordProcessingStatus, models.NamedEntityProcessingStatus, models.SentimentProcessingStatus]:
+        db_processing_status = Model(status=models.ProcessingStatusType.not_processed, source_text_id=id_)
+        db.add(db_processing_status)
+    db.commit()
+
+
 # source text
 
 
@@ -21,6 +31,7 @@ def create_source_text(db: Session, source_text: schemas.SourceTextCreate) -> mo
     db.add(db_source_text)
     db.commit()
     db.refresh(db_source_text)
+    create_processing_status(db, db_source_text.id)
     return db_source_text
 
 
