@@ -15,8 +15,8 @@ if __name__ == "__main__":
     preprocessor = WordPreprocessor()
     analyzer = WordAnalyzer.load(Path("weights/words/mystem-3.1-linux-64bit.tar.gz"))
     postprocessor = WordPostprocessor()
-    text_provider = WordTextProvider(url="http://app:8000/text")
-    result_publisher = WordResultPublisher(url="http://app:8000/word")
+    text_provider = WordTextProvider(url="http://app:8000/text/read")
+    result_publisher = WordResultPublisher(url="http://app:8000/word/add")
 
     runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
 

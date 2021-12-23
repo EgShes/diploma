@@ -53,7 +53,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8080, help="Port of db api")
     args = parser.parse_args()
 
-    url = f"{args.ip}:{args.port}/add_text"
+    url = f"{args.ip}:{args.port}/text/add"
 
     for i in tqdm(count()):
         try:

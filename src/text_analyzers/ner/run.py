@@ -17,8 +17,8 @@ if __name__ == "__main__":
         Path("weights/ner/slovnet_ner_news_v1.tar"),
     )
     postprocessor = NerPostprocessor()
-    text_provider = NerTextProvider(url="http://app:8000/text")
-    result_publisher = NerResultPublisher(url="http://app:8000/named_entity")
+    text_provider = NerTextProvider(url="http://app:8000/text/add")
+    result_publisher = NerResultPublisher(url="http://app:8000/named_entity/add")
 
     ner_runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
 

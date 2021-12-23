@@ -14,8 +14,8 @@ if __name__ == "__main__":
     preprocessor = SentimentPreprocessor()
     analyzer = SentimentAnalyzer.load(Path("weights/sentiment/fasttext-social-network-model.bin"))
     postprocessor = SentimentPostprocessor()
-    text_provider = SentimentTextProvider(url="http://app:8000/text")
-    result_publisher = SentimentResultPublisher(url="http://app:8000/sentiment")
+    text_provider = SentimentTextProvider(url="http://app:8000/text/add")
+    result_publisher = SentimentResultPublisher(url="http://app:8000/sentiment/add")
 
     runner = Runner(preprocessor, analyzer, postprocessor, text_provider, result_publisher)
 
