@@ -1,11 +1,18 @@
+from typing import List
+
 from sqlalchemy.orm import Session
 
 from src.database import models, schemas
+from src.database.crud.common import get_by_id, get_by_id_list
 from src.database.crud.processing_status import create_processing_status
 
 
-def get_source_text(db: Session, id_: int):
-    return db.query(models.SourceText).filter(models.SourceText.id == id_).first()
+def get_source_text_by_id(db: Session, id_: int) -> schemas.SourceText:
+    return get_by_id(db, models.SourceText, id_)
+
+
+def get_source_text_by_ids(db: Session, ids: List[int]) -> List[schemas.SourceText]:
+    return get_by_id_list(db, models.SourceText, ids)
 
 
 def create_source_text(db: Session, source_text: schemas.SourceTextCreate) -> models.SourceText:
