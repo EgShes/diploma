@@ -1,7 +1,8 @@
+from typing import Type
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from src.config import dev_logger
 from src.database import models, schemas
 
 
@@ -16,6 +17,14 @@ def create_processing_status(db: Session, id_: int):
     for Model in [models.WordProcessingStatus, models.NamedEntityProcessingStatus, models.SentimentProcessingStatus]:
         db_processing_status = Model(status=models.ProcessingStatusType.not_processed, source_text_id=id_)
         db.add(db_processing_status)
+    db.commit()
+
+
+def update_processing_status(
+    db: Session, model: Type[models.ProcessingStatus], id_: int, status: models.ProcessingStatusType
+):
+    db_processing_status = db.query(model).filter(model.source_text_id == id_).first()
+    db_processing_status.status = status
     db.commit()
 
 
@@ -49,6 +58,9 @@ def create_named_entity(
     db.add(db_named_entity)
     db.commit()
     db.refresh(db_named_entity)
+    update_processing_status(
+        db, models.NamedEntityProcessingStatus, source_text_id, models.ProcessingStatusType.processed
+    )
     return db_named_entity
 
 
@@ -68,7 +80,7 @@ def create_word(db: Session, source_text_id: int, word: schemas.WordCreate) -> m
         db.refresh(association)
     except IntegrityError as e:
         raise AlreadyExistsError("Data you are trying to insert already exists") from e
-    dev_logger.debug("Successfully added a word")
+    update_processing_status(db, models.WordProcessingStatus, source_text_id, models.ProcessingStatusType.processed)
     return association
 
 
@@ -82,4 +94,7 @@ def create_sentiment(db: Session, source_text_id: int, sentiment: schemas.Sentim
     db.add(db_sentiment)
     db.commit()
     db.refresh(db_sentiment)
+    update_processing_status(
+        db, models.SentimentProcessingStatus, source_text_id, models.ProcessingStatusType.processed
+    )
     return db_sentiment
