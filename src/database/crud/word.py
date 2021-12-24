@@ -34,4 +34,6 @@ def get_word_by_ids(db: Session, ids: List[int]) -> List[schemas.Word]:
 
 
 def get_oldest_not_processed_words(db: Session, n: int) -> List[int]:
-    return get_oldest_not_processed(db, models.WordProcessingStatus, n)
+    source_text_ids = get_oldest_not_processed(db, models.WordProcessingStatus, n)
+    update_processing_status(db, models.WordProcessingStatus, source_text_ids, models.ProcessingStatusType.processing)
+    return source_text_ids

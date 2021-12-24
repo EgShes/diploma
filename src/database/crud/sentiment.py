@@ -28,4 +28,8 @@ def get_sentiment_by_ids(db: Session, ids: List[int]) -> List[schemas.Sentiment]
 
 
 def get_oldest_not_processed_sentiments(db: Session, n: int) -> List[int]:
-    return get_oldest_not_processed(db, models.SentimentProcessingStatus, n)
+    source_text_ids = get_oldest_not_processed(db, models.SentimentProcessingStatus, n)
+    update_processing_status(
+        db, models.SentimentProcessingStatus, source_text_ids, models.ProcessingStatusType.processing
+    )
+    return source_text_ids
