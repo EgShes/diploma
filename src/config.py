@@ -27,6 +27,19 @@ class DbConfig:
         return f"postgresql://{cls.db_user}:{cls.db_password}@{cls.db_service}/{cls.db_name}"
 
 
+class RabbitConfig:
+    url = os.environ.get("RABBIT_URL")
+
+
+class DispatcherConfig:
+    words_batch = 5
+    words_sleep = 10
+    named_entities_batch = 5
+    named_entities_sleep = 10
+    sentiments_batch = 5
+    sentiments_sleep = 10
+
+
 loggers_config_path = Path(__file__).parent / "loggers.conf"
 
 app_logger = Logger.from_config("app_logger", loggers_config_path)

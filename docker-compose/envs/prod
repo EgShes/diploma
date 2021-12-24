@@ -1,3 +1,5 @@
 POSTGRES_DB=<secret>
 POSTGRES_USER=<secret>
 POSTGRES_PASSWORD=<secret>
+
+RABBIT_URL=<secret>

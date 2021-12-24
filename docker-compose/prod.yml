@@ -71,5 +71,18 @@ services:
       queue:
         condition: service_healthy
 
+  dispatcher:
+    build:
+      context: ..
+      dockerfile: docker-compose/dockerfiles/DispatcherDockerfile
+      target: prod
+    env_file:
+      - envs/prod
+    depends_on:
+      - ner
+      - words
+      - sentiment
+
+
 volumes:
   postgres_data_diploma:
