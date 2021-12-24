@@ -1,4 +1,4 @@
-from typing import List, Type
+from typing import List, Type, Union
 
 from sqlalchemy.orm import Session
 
@@ -13,9 +13,11 @@ def create_processing_status(db: Session, id_: int):
 
 
 def update_processing_status(
-    db: Session, model: Type[models.ProcessingStatus], id_: int, status: models.ProcessingStatusType
+    db: Session, model: Type[models.ProcessingStatus], id_: Union[int, List[int]], status: models.ProcessingStatusType
 ):
-    db_processing_status = db.query(model).filter(model.source_text_id == id_).first()
+    if isinstance(id_, int):
+        id_ = [id_]
+    db_processing_status = db.query(model).filter(model.source_text_id.in_(id_)).first()
     db_processing_status.status = status
     db.commit()
 

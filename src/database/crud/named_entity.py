@@ -23,13 +23,17 @@ def create_named_entity(
     return db_named_entity
 
 
-def get_oldest_not_processed_named_entities(db: Session, n: int) -> List[int]:
-    return get_oldest_not_processed(db, models.NamedEntityProcessingStatus, n)
-
-
 def get_named_entity_by_id(db: Session, id_: int) -> schemas.NamedEntity:
     return get_by_id(db, models.NamedEntity, id_)
 
 
 def get_named_entity_by_ids(db: Session, ids: List[int]) -> List[schemas.NamedEntity]:
     return get_by_id_list(db, models.NamedEntity, ids)
+
+
+def get_oldest_not_processed_named_entities(db: Session, n: int) -> List[int]:
+    source_text_ids = get_oldest_not_processed(db, models.NamedEntityProcessingStatus, n)
+    update_processing_status(
+        db, models.NamedEntityProcessingStatus, source_text_ids, models.ProcessingStatusType.processing
+    )
+    return source_text_ids
