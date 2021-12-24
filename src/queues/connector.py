@@ -25,14 +25,12 @@ class RabbitConnector:
     def __init__(self, rabbit_dsn: str, queues_config: RabbitConfigSchema):
         self.rabbit_dsn = rabbit_dsn
         self.queues_config = queues_config
-        self.connection = None
+        self.init_connection()
 
     def init_connection(self):
         self.connection = BlockingConnection(URLParameters(self.rabbit_dsn))
 
     def get_channel(self) -> BlockingChannel:
-        if not self.connection:
-            raise ConnectionNotInitializedError("You should init connection first")
         channel = self.connection.channel()
 
         self.init_exchanges(channel, self.queues_config.exchanges)

@@ -56,3 +56,11 @@ services:
       - envs/dev
     volumes:
       - ../src:/app/src
+
+  dispatcher:
+    build:
+      target: dev
+    env_file:
+      - envs/dev
+    volumes:
+      - ../src:/app/src
