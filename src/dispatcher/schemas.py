@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, conlist
 
 
 class SourceText(BaseModel):
-    id = int
+    id: int
     text: str
     source: str
 
