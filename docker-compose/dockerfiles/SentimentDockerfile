@@ -1,11 +1,21 @@
+# syntax=docker/dockerfile:1.3
+
 FROM python:3.8 as base
 
 RUN apt update && apt upgrade -y
-RUN pip install --upgrade pip
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip
 
 COPY requirements/analizers requirements
-RUN pip install -r requirements/common.txt \
-    && pip install -r requirements/similarity.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements/common.txt
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements/similarity.txt
+
+COPY requirements requirements
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements/queues.txt
 
 WORKDIR /app
 COPY weights/sentiment /app/weights/sentiment
@@ -22,6 +32,7 @@ CMD ["python", "-m", "src.text_analyzers.sentiment.run"]
 FROM base as dev
 
 COPY requirements/dev.txt requirements_dev.txt
-RUN pip install -r requirements_dev.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements_dev.txt
 
 CMD ["python", "-m", "src.text_analyzers.sentiment.run"]
