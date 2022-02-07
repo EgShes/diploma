@@ -1,12 +1,17 @@
+# syntax=docker/dockerfile:1.3
+
 FROM python:3.8 as base
 
 RUN apt update && apt upgrade -y
-RUN pip install --upgrade pip
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip
 
-COPY requirements/dispatcher.txt dispatcher_requirements.txt
-COPY requirements/queues.txt queues_requirements.txt
-RUN pip install -r dispatcher_requirements.txt \
-    && pip install -r queues_requirements.txt
+COPY requirements requirements
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements/dispatcher.txt
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements/queues.txt
 
 WORKDIR /app
 
@@ -23,6 +28,7 @@ CMD ["python", "-m", "src.dispatcher.main"]
 FROM base as dev
 
 COPY requirements/dev.txt requirements_dev.txt
-RUN pip install -r requirements_dev.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements_dev.txt
 
 CMD ["python", "-m", "src.dispatcher.main"]
