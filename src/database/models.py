@@ -94,17 +94,11 @@ class ProcessingStatus:
 
     id = Column(Integer, primary_key=True, index=True)
     status = Column(Enum(ProcessingStatusType), nullable=False)
-    # source_text_id = Column(Integer, ForeignKey("source_text.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     @declared_attr
     def source_text_id(cls):
         return Column(Integer, ForeignKey("source_text.id"), nullable=False)
-
-    # @declared_attr
-    # def source_text(cls):
-    #     return relationship("SourceText", back_populates="status")
-    # source_text = relationship("SourceText", back_populates="sentiments")
 
 
 class WordProcessingStatus(ProcessingStatus, Base):

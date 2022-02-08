@@ -35,7 +35,7 @@ def create_word_for_text(text_id: int, word: schemas.WordCreate, db: Session = D
 def get_source_texts_for_processing(n: int, db: Session = Depends(get_db)) -> List[schemas.SourceText]:
     source_text_ids = get_oldest_not_processed_words(db, n)
     if not source_text_ids:
-        return []
+        raise HTTPException(status_code=404, detail="No data for processing")
     return get_source_text_by_ids(db, source_text_ids)
 
 

@@ -1,10 +1,6 @@
-import logging
-from typing import Tuple
+from datetime import datetime, timezone
 
-import requests
-from pydantic import BaseModel
-
-from src.text_analyzers.runner import Meta, TextProvider
+from pydantic import BaseModel, Field, conlist
 
 
 class RequestFailedException(Exception):
@@ -17,24 +13,14 @@ class SourceText(BaseModel):
     source: str
 
 
-class RawTextProvider(TextProvider):
-    def __init__(self, url: str):
-        self._url = url
+class Payload(BaseModel):
+    source_texts: conlist(SourceText, max_items=100)
 
-    def __iter__(self):
-        self._counter = 1
-        return self
 
-    def __next__(self) -> Tuple[str, Meta]:
-        try:
-            response = requests.get(self._url, params={"text_id": self._counter})
-            self._counter += 1
-            if response.status_code != 200:
-                raise RequestFailedException(
-                    f'Got response code {response.status_code} with message {response.content.decode("utf-8")}'
-                )
-            data = SourceText.parse_raw(response.content)
-            return data.text, {"id": data.id}
-        except Exception as e:
-            logging.error(e)
-            raise StopIteration from e
+class Message(BaseModel):
+    payload: Payload
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class Meta(BaseModel):
+    id: int

@@ -1,8 +1,14 @@
 from abc import ABC, abstractmethod
-from time import sleep
-from typing import Any, Dict, Tuple
+from typing import Any, Tuple
 
-Meta = Dict[str, Any]
+from amqp.spec import Basic
+from pika.adapters.blocking_connection import BlockingChannel
+
+from src.config import RabbitConfig, dev_logger
+from src.dispatcher.schemas import Message
+from src.queues.connector import RabbitConnector
+from src.queues.queues_config import queues_config
+from src.text_analyzers.common import Meta
 
 
 class Preprocessor(ABC):
@@ -60,13 +66,11 @@ class Runner:
         preprocessor: Preprocessor,
         analyzer: Analyzer,
         postprocessor: Postprocessor,
-        text_provider: TextProvider,
         result_publisher: ResultPublisher,
     ):
         self.preprocessor = preprocessor
         self.analyzer = analyzer
         self.postprocessor = postprocessor
-        self.text_provider = iter(text_provider)
         self.result_publisher = result_publisher
 
     def analyze_text(self, text: str):
@@ -75,12 +79,19 @@ class Runner:
         postprocessed = self.postprocessor.postprocess(analyzed)
         return postprocessed
 
-    def run(self):
-        while True:
-            try:
-                text, meta = next(self.text_provider)
-            except StopIteration:
-                sleep(10)
-                continue
-            result = self.analyze_text(text)
-            self.result_publisher.publish(result, meta)
+    def process(self, channel: BlockingChannel, method: Basic.Deliver, properties, body: bytes):
+        message = Message.parse_raw(body)
+
+        for source_text in message.payload.source_texts:
+            result = self.analyze_text(source_text.text)
+            self.result_publisher.publish(result, Meta.parse_obj(source_text))
+
+            dev_logger.debug(f"Successfully processed message {message}")
+
+        channel.basic_ack(delivery_tag=method.delivery_tag)
+
+    def start_consuming(self, queue: str):
+        channel = RabbitConnector(RabbitConfig.url, queues_config).get_channel()
+        channel.basic_consume(queue, on_message_callback=self.process)
+        channel.basic_qos(prefetch_count=1)
+        channel.start_consuming()

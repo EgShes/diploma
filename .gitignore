@@ -134,4 +134,5 @@ dmypy.json
 # jupyter notebooks
 notebooks/
 
-weights
+weights/
+dumps/

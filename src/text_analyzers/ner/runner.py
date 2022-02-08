@@ -5,7 +5,6 @@ from navec import Navec
 from slovnet import NER
 from slovnet.markup import SpanMarkup
 
-from src.text_analyzers.common import RawTextProvider
 from src.text_analyzers.ner.schemas import NamedEntity, NerOutputSchema
 from src.text_analyzers.runner import (
     Analyzer,
@@ -52,14 +51,10 @@ class NerPostprocessor(Postprocessor):
         return NerOutputSchema(entities=entities)
 
 
-class NerTextProvider(RawTextProvider):
-    pass
-
-
 class NerResultPublisher(ResultPublisher):
     def __init__(self, url: str):
         self._url = url
 
     def publish(self, result: NerOutputSchema, meta: Meta):
         for named_entity in result.entities:
-            requests.post(self._url, params={"text_id": meta["id"]}, json=named_entity.dict())
+            requests.post(self._url, params={"text_id": meta.id}, json=named_entity.dict())

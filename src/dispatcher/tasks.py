@@ -19,20 +19,19 @@ async def dispatch(data_url: str, batch_size: int, exchange: str, routing_key: s
     async with aiohttp.ClientSession() as session:
         while True:
             async with session.get(data_url, params={"n": batch_size}) as resp:
-                content = await resp.json()
+                if resp.status == 200:
+                    content = await resp.json()
+                    message = create_message(content)
 
-                message = create_message(content)
-
-                channel = RabbitConnector(RabbitConfig.url, queues_config).get_channel()
-                channel.basic_publish(exchange, routing_key, message.json())
-                dev_logger.debug(f"Published to {exchange} with key {routing_key}")
-
+                    channel = RabbitConnector(RabbitConfig.url, queues_config).get_channel()
+                    channel.basic_publish(exchange, routing_key, message.json())
+                    dev_logger.debug(f"Published to {exchange} with key {routing_key}")
             await asyncio.sleep(sleep)
 
 
 async def words_dispatcher():
     await dispatch(
-        data_url="http://app:8000/word/for_processing",
+        data_url="http://app:8000/word/for_processing/",
         batch_size=DispatcherConfig.words_batch,
         exchange=routing_config.word_queue.exchange,
         routing_key=routing_config.word_queue.routing_key,
@@ -42,7 +41,7 @@ async def words_dispatcher():
 
 async def named_entity_dispatcher():
     await dispatch(
-        data_url="http://app:8000/named_entity/for_processing",
+        data_url="http://app:8000/named_entity/for_processing/",
         batch_size=DispatcherConfig.named_entities_batch,
         exchange=routing_config.ner_queue.exchange,
         routing_key=routing_config.ner_queue.routing_key,
@@ -52,7 +51,7 @@ async def named_entity_dispatcher():
 
 async def sentiment_dispatcher():
     await dispatch(
-        data_url="http://app:8000/sentiment/for_processing",
+        data_url="http://app:8000/sentiment/for_processing/",
         batch_size=DispatcherConfig.sentiments_batch,
         exchange=routing_config.sentiment_queue.exchange,
         routing_key=routing_config.sentiment_queue.routing_key,

@@ -1,4 +1,4 @@
-POSTGRES_DB=<secret>
+POSTGRES_DB=texts
 POSTGRES_USER=<secret>
 POSTGRES_PASSWORD=<secret>
 

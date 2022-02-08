@@ -8,7 +8,6 @@ from nltk.corpus import stopwords
 from pydantic import BaseModel
 from pymystem3 import Mystem
 
-from src.text_analyzers.common import RawTextProvider
 from src.text_analyzers.runner import (
     Analyzer,
     Meta,
@@ -67,14 +66,10 @@ class WordPostprocessor(Postprocessor):
         return [WordSchema(text=word, quantity=count) for word, count in Counter(analyzer_output).items()]
 
 
-class WordTextProvider(RawTextProvider):
-    pass
-
-
 class WordResultPublisher(ResultPublisher):
     def __init__(self, url: str):
         self._url = url
 
     def publish(self, result: List[WordSchema], meta: Meta):
         for word in result:
-            requests.post(self._url, params={"text_id": meta["id"]}, json=word.dict())
+            requests.post(self._url, params={"text_id": meta.id}, json=word.dict())
