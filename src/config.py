@@ -33,11 +33,11 @@ class RabbitConfig:
 
 class DispatcherConfig:
     words_batch = 5
-    words_sleep = 10
+    words_sleep = 5
     named_entities_batch = 5
-    named_entities_sleep = 10
+    named_entities_sleep = 5
     sentiments_batch = 5
-    sentiments_sleep = 10
+    sentiments_sleep = 5
 
 
 loggers_config_path = Path(__file__).parent / "loggers.conf"

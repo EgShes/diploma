@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends, Query
 from pydantic import conlist
 from sqlalchemy.orm import Session
@@ -26,7 +26,7 @@ def create_named_entity_for_text(text_id: int, named_entity: schemas.NamedEntity
 def get_source_texts_for_processing(n: int, db: Session = Depends(get_db)) -> List[schemas.SourceText]:
     source_text_ids = get_oldest_not_processed_named_entities(db, n)
     if not source_text_ids:
-        return []
+        raise HTTPException(status_code=404, detail="No data for processing")
     return get_source_text_by_ids(db, source_text_ids)
 
 

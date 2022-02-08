@@ -5,7 +5,6 @@ import requests
 from dostoevsky.models import FastTextSocialNetworkModel
 from dostoevsky.tokenization import RegexTokenizer
 
-from src.text_analyzers.common import RawTextProvider
 from src.text_analyzers.runner import (
     Analyzer,
     Meta,
@@ -50,13 +49,9 @@ class SentimentPostprocessor(Postprocessor):
         return Sentiment(probability=probability, type=sentiment_type)
 
 
-class SentimentTextProvider(RawTextProvider):
-    pass
-
-
 class SentimentResultPublisher(ResultPublisher):
     def __init__(self, url: str):
         self._url = url
 
     def publish(self, result: Sentiment, meta: Meta):
-        requests.post(self._url, params={"text_id": meta["id"]}, json=result.dict())
+        requests.post(self._url, params={"text_id": meta.id}, json=result.dict())
