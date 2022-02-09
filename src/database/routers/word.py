@@ -41,4 +41,14 @@ def get_source_texts_for_processing(n: int, db: Session = Depends(get_db)) -> Li
 
 @router.get("/read/", response_model=List[schemas.Word])
 def get_words(ids: conlist(int, max_items=50) = Query(...), db: Session = Depends(get_db)) -> List[schemas.Word]:
-    return get_word_by_ids(db, ids)
+    return_words = []
+    for word in get_word_by_ids(db, ids):
+        return_words.append(
+            schemas.Word(
+                id=word.id,
+                text=word.text,
+                created_at=word.created_at,
+                source_text_ids=[source_text_word.source_text_id for source_text_word in word.source_texts],
+            )
+        )
+    return return_words
