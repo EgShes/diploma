@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres
+    env_file:
+      - envs/test
+    healthcheck:
+      test: pg_isready -q -U $$POSTGRES_USER
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - /var/lib/postgresql/data
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker-compose/dockerfiles/AppDockerfile
+      target: prod
+    env_file:
+      - envs/test
+    depends_on:
+      db:
+        condition: service_healthy
+
+  tests:
+    build:
+      context: ..
+      dockerfile: docker-compose/dockerfiles/FuncTestsDockerfile
+    depends_on:
+      - app

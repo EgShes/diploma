@@ -24,3 +24,25 @@ DOCKER_BUILDKIT=1 docker-compose -f prod.yml up --build --force-recreate
 ```bash
 DOCKER_BUILDKIT=1 docker-compose -f prod.yml -f dev_override.yml up --build --force-recreate
 ```
+
+## Tests
+
+### Functional tests of db api
+
+```bash
+DOCKER_BUILDKIT=1 docker-compose -f test_functional.yml up --build --force-recreate -V --exit-code-from tests
+```
+
+## Dumps
+
+### Make dump
+
+```bash
+docker exec -i diploma_db_1 /bin/bash -c "PGPASSWORD=postgres pg_dump --username postgres texts" > dumps/dump.sql
+```
+
+### Restore dump
+
+```bash
+docker exec -i diploma_db_1 /bin/bash -c "PGPASSWORD=postgres psql --username postgres texts" < dumps/dump.sql
+```

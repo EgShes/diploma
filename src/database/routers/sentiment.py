@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends, Query
-from pydantic import conlist
+from pydantic import conint, conlist
 from sqlalchemy.orm import Session
 
 from src.database import schemas
@@ -23,7 +23,7 @@ def create_sentiment_for_text(text_id: int, sentiment: schemas.SentimentCreate, 
 
 
 @router.get("/for_processing/", response_model=List[schemas.SourceText])
-def get_source_texts_for_processing(n: int, db: Session = Depends(get_db)) -> List[schemas.SourceText]:
+def get_source_texts_for_processing(n: conint(gt=0), db: Session = Depends(get_db)) -> List[schemas.SourceText]:
     source_text_ids = get_oldest_not_processed_sentiments(db, n)
     if not source_text_ids:
         raise HTTPException(status_code=404, detail="No data for processing")
