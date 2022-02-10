@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends, Query
-from pydantic import conlist
+from pydantic import conint, conlist
 from sqlalchemy.orm import Session
 
 from src.database import schemas
@@ -27,12 +27,13 @@ def create_word_for_text(text_id: int, word: schemas.WordCreate, db: Session = D
         association = create_word(db, source_text_id=text_id, word=word)
     except AlreadyExistsError as e:
         raise HTTPException(403, detail=e.args)
-    association.word.source_text_id = association.source_text_id
+    # TODO fix assisiation between word and text
+    association.word.source_text_ids = [association.source_text_id]
     return schemas.Word.from_orm(association.word)
 
 
 @router.get("/for_processing/", response_model=List[schemas.SourceText])
-def get_source_texts_for_processing(n: int, db: Session = Depends(get_db)) -> List[schemas.SourceText]:
+def get_source_texts_for_processing(n: conint(gt=0), db: Session = Depends(get_db)) -> List[schemas.SourceText]:
     source_text_ids = get_oldest_not_processed_words(db, n)
     if not source_text_ids:
         raise HTTPException(status_code=404, detail="No data for processing")
