@@ -6,7 +6,7 @@ services:
       - 5432:5432
 
   queue:
-    image: rabbitmq:management
+    image: rabbitmq:3.9.12-management
     env_file:
       - envs/dev
     ports:

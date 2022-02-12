@@ -12,7 +12,8 @@ services:
       - postgres_data_diploma:/var/lib/postgresql/data
 
   queue:
-    image: rabbitmq:3.9-alpine
+    image: rabbitmq:3.9.12-alpine
+    user: rabbitmq
     env_file:
       - envs/prod
     healthcheck:
