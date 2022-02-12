@@ -16,8 +16,8 @@ def create_message(content: List[Dict[str, str]]) -> Message:
 
 async def dispatch(data_url: str, batch_size: int, exchange: str, routing_key: str, sleep: int):
 
-    async with aiohttp.ClientSession() as session:
-        while True:
+    while True:
+        async with aiohttp.ClientSession() as session:
             async with session.get(data_url, params={"n": batch_size}) as resp:
                 if resp.status == 200:
                     content = await resp.json()
