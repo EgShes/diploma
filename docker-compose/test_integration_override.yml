@@ -1,0 +1,43 @@
+services:
+  db:
+    env_file:
+      - envs/test
+    volumes:
+      - /var/lib/postgresql/data
+
+  app:
+    env_file:
+      - envs/test
+
+  queue:
+    env_file:
+      - envs/test
+
+  ner:
+    env_file:
+    - envs/test
+
+  words:
+    env_file:
+      - envs/test
+
+  sentiment:
+    env_file:
+      - envs/test
+
+  dispatcher:
+    env_file:
+      - envs/test
+
+  tests:
+    build:
+      context: ..
+      dockerfile: docker-compose/dockerfiles/TestsDockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: >
+      sh -c "python3 /tests/integration/utils/wait_for_db_app.py
+      && python3 /tests/integration/utils/add_texts.py
+      && sleep 30
+      && pytest -vv /tests/integration"

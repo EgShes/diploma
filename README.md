@@ -33,6 +33,12 @@ DOCKER_BUILDKIT=1 docker-compose -f prod.yml -f dev_override.yml up --build --fo
 DOCKER_BUILDKIT=1 docker-compose -f test_functional.yml up --build --force-recreate -V --exit-code-from tests
 ```
 
+### Integration tests
+
+```bash
+DOCKER_BUILDKIT=1 docker-compose -f prod.yml -f test_integration_override.yml up --build -V --exit-code-from tests
+```
+
 ## Dumps
 
 ### Make dump
