@@ -37,13 +37,3 @@ def ner_publisher() -> NerResultPublisher:
 @pytest.fixture(scope="session")
 def ner_runner(ner_preprocessor, ner_analyzer, ner_postprocessor, ner_publisher) -> Runner:
     return Runner(ner_preprocessor, ner_analyzer, ner_postprocessor, ner_publisher)
-
-
-@pytest.fixture(scope="session")
-def analyzer_input() -> str:
-    return "Вася Иванов вчера в Испанию в командировку улетел, представляешь?"
-
-
-@pytest.fixture()
-def requests_mock(mocker):
-    return mocker.Mock()

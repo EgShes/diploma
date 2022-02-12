@@ -36,13 +36,3 @@ def sentiment_runner(
     sentiment_preprocessor, sentiment_analyzer, sentiment_postprocessor, sentiment_publisher
 ) -> Runner:
     return Runner(sentiment_preprocessor, sentiment_analyzer, sentiment_postprocessor, sentiment_publisher)
-
-
-@pytest.fixture(scope="session")
-def analyzer_input() -> str:
-    return "Вася Иванов вчера в Испанию в командировку улетел, представляешь?"
-
-
-@pytest.fixture()
-def requests_mock(mocker):
-    return mocker.Mock()
