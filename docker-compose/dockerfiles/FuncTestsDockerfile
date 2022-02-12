@@ -12,6 +12,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 WORKDIR /app
 
-COPY tests/functional functional
+COPY tests tests
 
-CMD ["pytest", "-vv", "functional"]
+CMD ["pytest", "-vv", "tests/functional"]
