@@ -25,6 +25,7 @@ services:
   tests:
     build:
       context: ..
-      dockerfile: docker-compose/dockerfiles/FuncTestsDockerfile
+      dockerfile: docker-compose/dockerfiles/TestsDockerfile
     depends_on:
       - app
+    command: ["pytest", "-vv", "tests/functional"]

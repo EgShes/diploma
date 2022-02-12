@@ -25,6 +25,7 @@ FROM base as prod
 
 COPY src/text_analyzers /app/src/text_analyzers
 COPY src/queues /app/src/queues
+COPY src/dispatcher /app/src/dispatcher
 COPY src/config.py /app/src/config.py
 COPY src/logger.py /app/src/logger.py
 COPY src/loggers.conf /app/src/loggers.conf

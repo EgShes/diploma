@@ -40,7 +40,6 @@ services:
       - envs/dev
     volumes:
       - ../src:/app/src
-    command: echo kek
 
   words:
     build:
@@ -49,7 +48,6 @@ services:
       - envs/dev
     volumes:
       - ../src:/app/src
-#    command: echo kek
 
   sentiment:
     build:
@@ -58,7 +56,6 @@ services:
       - envs/dev
     volumes:
       - ../src:/app/src
-    command: echo kek
 
   dispatcher:
     build:
@@ -67,4 +64,3 @@ services:
       - envs/dev
     volumes:
       - ../src:/app/src
-    command: echo kek

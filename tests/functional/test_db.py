@@ -5,6 +5,11 @@ import pytest
 import requests
 
 
+def test_health_check(db_app_url: str):
+    response = requests.get(db_app_url + "health_check/")
+    assert response.status_code == 200
+
+
 @pytest.mark.parametrize(
     "url",
     [

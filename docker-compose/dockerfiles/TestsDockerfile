@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.3
 
-FROM python:3.8 as base
+FROM python:3.8
 
 RUN apt update && apt upgrade -y
 RUN --mount=type=cache,target=/root/.cache/pip \
@@ -10,8 +10,4 @@ COPY requirements/test.txt requirements.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -r requirements.txt
 
-WORKDIR /app
-
-COPY tests tests
-
-CMD ["pytest", "-vv", "tests/functional"]
+COPY tests /tests
