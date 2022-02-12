@@ -14,8 +14,8 @@ import requests
         "sentiment/read/",
     ],
 )
-def test_read_empty(base_url: str, url: str):
-    response = requests.get(base_url + url, params={"ids": list(range(-10, 10))})
+def test_read_empty(db_app_url: str, url: str):
+    response = requests.get(db_app_url + url, params={"ids": list(range(-10, 10))})
     assert response.status_code == 200
     assert len(response.json()) == 0
 
@@ -28,8 +28,8 @@ def test_read_empty(base_url: str, url: str):
         "sentiment/for_processing/",
     ],
 )
-def test_for_processing_empty(base_url: str, url: str):
-    response = requests.get(base_url + url, params={"n": 10})
+def test_for_processing_empty(db_app_url: str, url: str):
+    response = requests.get(db_app_url + url, params={"n": 10})
     assert response.status_code == 404
 
 
@@ -42,8 +42,8 @@ def test_for_processing_empty(base_url: str, url: str):
     ],
 )
 @pytest.mark.parametrize("n", [-10, 0])
-def test_for_processing_wrong_value(base_url: str, url: str, n: int):
-    response = requests.get(base_url + url, params={"n": n})
+def test_for_processing_wrong_value(db_app_url: str, url: str, n: int):
+    response = requests.get(db_app_url + url, params={"n": n})
     assert response.status_code == 422
 
 
@@ -55,8 +55,8 @@ def test_for_processing_wrong_value(base_url: str, url: str, n: int):
         "Ненавижу работать по вечерам",
     ],
 )
-def test_text_addition(base_url: str, text: str):
-    response = requests.post(base_url + "text/add/", json={"text": text, "source": "vk"})
+def test_text_addition(db_app_url: str, text: str):
+    response = requests.post(db_app_url + "text/add/", json={"text": text, "source": "vk"})
     data = response.json()
     assert response.status_code == 200
     assert data["text"] == text
@@ -74,8 +74,8 @@ def test_text_addition(base_url: str, text: str):
     ],
 )
 @pytest.mark.parametrize("n", [1, 2])
-def test_for_processing_full(base_url: str, url: str, n: int):
-    response = requests.get(base_url + url, params={"n": n})
+def test_for_processing_full(db_app_url: str, url: str, n: int):
+    response = requests.get(db_app_url + url, params={"n": n})
     data = response.json()
     assert response.status_code == 200
     assert len(data) == n
@@ -92,8 +92,8 @@ def test_for_processing_full(base_url: str, url: str, n: int):
         ("sentiment/add", {"text_id": 2}, {"type": "negative", "probability": 0.65}),
     ],
 )
-def test_analysis_result_addition(base_url: str, url: str, params: Dict[str, Any], data: Dict[str, Any]):
-    response = requests.post(base_url + url, params=params, json=data)
+def test_analysis_result_addition(db_app_url: str, url: str, params: Dict[str, Any], data: Dict[str, Any]):
+    response = requests.post(db_app_url + url, params=params, json=data)
     assert response.status_code == 200
     assert len(response.json()) != 0
 
@@ -107,7 +107,7 @@ def test_analysis_result_addition(base_url: str, url: str, params: Dict[str, Any
         ("sentiment/read/", [1, 2]),
     ],
 )
-def test_read_full(base_url: str, url: str, ids: List[int]):
-    response = requests.get(base_url + url, params={"ids": ids})
+def test_read_full(db_app_url: str, url: str, ids: List[int]):
+    response = requests.get(db_app_url + url, params={"ids": ids})
     assert response.status_code == 200
     assert len(response.json()) == len(ids)
