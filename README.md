@@ -27,6 +27,12 @@ DOCKER_BUILDKIT=1 docker-compose -f prod.yml -f dev_override.yml up --build --fo
 
 ## Tests
 
+### Unit tests
+
+```bash
+pytest -vv tests/unit
+```
+
 ### Functional tests of db api
 
 ```bash
