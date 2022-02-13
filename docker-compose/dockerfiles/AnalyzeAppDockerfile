@@ -1,0 +1,33 @@
+# syntax=docker/dockerfile:1.3
+
+FROM python:3.8 as base
+
+RUN apt update && apt upgrade -y
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip
+
+COPY requirements/analyze_app.txt requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements.txt
+
+ENV PYTHONPATH='.'
+EXPOSE 8501
+
+WORKDIR /app
+
+FROM base as prod
+
+COPY src/analyze_app /app/src/analyze_app
+COPY src/config.py /app/src/config.py
+COPY src/logger.py /app/src/logger.py
+COPY src/loggers.conf /app/src/loggers.conf
+
+CMD ["streamlit", "run", "--server.headless", "true", "--browser.serverAddress", "localhost", "src/analyze_app/main.py"]
+
+FROM base as dev
+
+COPY requirements/dev.txt requirements_dev.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements_dev.txt
+
+CMD ["streamlit", "run", "--logger.level", "debug", "--browser.serverAddress", "localhost", "src/analyze_app/main.py"]
