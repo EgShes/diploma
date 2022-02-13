@@ -1,5 +1,6 @@
 import streamlit as st
 
+from src.analyze_app.ner import main as ner_main
 from src.analyze_app.sentiment import main as sentiment_main
 
 
@@ -21,7 +22,7 @@ def main():
     elif service == "Слова":
         return
     elif service == "Сущности":
-        return
+        ner_main()
 
 
 if __name__ == "__main__":
