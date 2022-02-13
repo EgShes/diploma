@@ -18,26 +18,26 @@ def init_connection():
 
 # TODO make it work with ids
 @st.cache(ttl=600)
-def get_sentiments(
+def get_ners(
     user_id: Optional[int], chat_id: Optional[int], from_: datetime.datetime, till: datetime.datetime
 ) -> pd.DataFrame:
     # include last day
     till = till + datetime.timedelta(days=1)
     with connection.cursor() as cursor:
-        # sql = "select id, type, created_at from sentiment where created_at >= %s and created_at < %s;"
         sql = """
         select
-            se.id as id,
-            se.type as type,
-            se.created_at as created_at,
+            ne.id as id,
+            ne.text as text,
+            ne.type as type,
+            ne.created_at as created_at,
             st.text as source_text
-        from sentiment se
-            left join source_text st on st.id = se.source_text_id
-        where se.created_at >= %s and se.created_at < %s;
+        from named_entity ne
+            left join source_text st on st.id = ne.source_text_id
+        where ne.created_at >= %s and ne.created_at < %s;
         """
         cursor.execute(sql, [from_, till])
         data = cursor.fetchall()
-        df = pd.DataFrame.from_records(data, columns=["id", "type", "created_at", "source_text"])
+        df = pd.DataFrame.from_records(data, columns=["id", "text", "type", "created_at", "source_text"])
         return df
 
 
@@ -62,12 +62,12 @@ def main():
         st.error("Дата начала поиска не может быть больше даты окончания")
         return
 
-    sentiment_df = get_sentiments(user_id, chat_id, from_date, till_date)
+    ner_df = get_ners(user_id, chat_id, from_date, till_date)
 
-    st.dataframe(sentiment_df)
+    st.dataframe(ner_df)
 
-    plot_df = sentiment_df.groupby("type").size().reset_index().rename(columns={0: "amount"})
-    fig = px.bar(plot_df, x="type", y="amount", title="Распределение тональности")
+    plot_df = ner_df.groupby("type").size().reset_index().rename(columns={0: "amount"})
+    fig = px.bar(plot_df, x="type", y="amount", title="Распределение сущностей")
     st.plotly_chart(fig)
 
 
