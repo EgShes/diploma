@@ -84,6 +84,18 @@ services:
       - words
       - sentiment
 
+  analyze_app:
+    build:
+      context: ..
+      dockerfile: docker-compose/dockerfiles/AnalyzeAppDockerfile
+      target: prod
+    ports:
+      - 8501:8501
+    env_file:
+      - envs/prod
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data_diploma:
