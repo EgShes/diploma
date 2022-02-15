@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -11,6 +11,8 @@ from src.database.models import EntityType, SentimentType
 class SourceTextBase(BaseModel):
     text: str
     source: str
+    employee_id: int
+    chat_id: int
 
 
 class SourceTextCreate(SourceTextBase):
@@ -23,6 +25,30 @@ class SourceText(SourceTextBase):
 
     class Config:
         orm_mode = True
+
+
+# employee
+
+
+class EmployeeBase(BaseModel):
+    passport: str
+    first_name: str
+    second_name: str
+    third_name: Optional[str]
+    department: str
+
+    class Config:
+        orm_mode = True
+
+
+class EmployeeCreate(EmployeeBase):
+    pass
+
+
+class Employee(EmployeeBase):
+    id: int
+    created_at: datetime
+    source_texts: List[SourceText]
 
 
 # named entity
