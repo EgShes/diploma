@@ -27,13 +27,26 @@ class ProcessingStatusType(str, enum.Enum):
     processed = "processed"
 
 
+class ChatType(str, enum.Enum):
+    direct = "direct"
+    group = "group"
+    comment = "comments"
+
+
 class SourceText(Base):
     __tablename__ = "source_text"
 
     id = Column(Integer, primary_key=True, index=True)
     text = Column(String, nullable=False)
     source = Column(String, nullable=False)
+    published_at = Column(DateTime(timezone=True), server_default=func.now())
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    employee_id = Column(Integer, ForeignKey("employee.id"), nullable=False)
+    author = relationship("Employee", back_populates="source_texts")
+
+    chat_id = Column(Integer, ForeignKey("chat.id"), nullable=False)
+    chat = relationship("Chat", back_populates="source_texts")
 
     named_entities = relationship("NamedEntity", back_populates="source_text")
     words = relationship("SourceTextWordAssociation", back_populates="source_text")
@@ -42,6 +55,43 @@ class SourceText(Base):
     word_processing_status = relationship("WordProcessingStatus", back_populates="source_text")
     named_entity_processing_status = relationship("NamedEntityProcessingStatus", back_populates="source_text")
     sentiment_processing_status = relationship("SentimentProcessingStatus", back_populates="source_text")
+
+
+class Employee(Base):
+    __tablename__ = "employee"
+
+    id = Column(Integer, primary_key=True, index=True)
+    passport = Column(String, unique=True, nullable=False)
+    first_name = Column(String, nullable=False)
+    second_name = Column(String, nullable=False)
+    third_name = Column(String, nullable=True)
+    department = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    source_texts = relationship("SourceText", back_populates="author")
+    chats = relationship("EmployeeChatAssociation", back_populates="employee")
+
+
+class Chat(Base):
+    __tablename__ = "chat"
+
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(Enum(ChatType), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    source_texts = relationship("SourceText", back_populates="chat")
+    employees = relationship("EmployeeChatAssociation", back_populates="chat")
+
+
+class EmployeeChatAssociation(Base):
+    __tablename__ = "employee_chart"
+    chat_id = Column(ForeignKey("chat.id"), primary_key=True)
+    employee_id = Column(ForeignKey("employee.id"), primary_key=True)
+    joined_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    employee = relationship("Employee", back_populates="chats")
+    chat = relationship("Chat", back_populates="employees")
 
 
 class NamedEntity(Base):
