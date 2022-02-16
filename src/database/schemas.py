@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -49,6 +50,31 @@ class Employee(EmployeeBase):
     id: int
     created_at: datetime
     source_texts: List[SourceText]
+
+
+# chat
+
+
+class ChatTypeType(str, Enum):
+    direct = "direct"
+    group = "group"
+    comment = "comments"
+
+
+class ChatBase(BaseModel):
+    type: ChatTypeType
+
+    class Config:
+        orm_mode = True
+
+
+class ChatCreate(ChatBase):
+    pass
+
+
+class Chat(ChatBase):
+    id: int
+    created_at: datetime
 
 
 # named entity
