@@ -21,5 +21,5 @@ def add_employee(employee: schemas.EmployeeCreate, db: Session = Depends(get_db)
 @router.get("/read/", response_model=List[schemas.Employee])
 def get_employees(
     ids: conlist(conint(gt=0), max_items=50) = Query(...), db: Session = Depends(get_db)
-) -> List[schemas.SourceText]:
+) -> List[schemas.Employee]:
     return get_employee_by_ids(db, ids)
