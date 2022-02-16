@@ -17,10 +17,12 @@ def test_health_check(db_app_url: str):
         "word/read/",
         "named_entity/read/",
         "sentiment/read/",
+        "chat/read/",
+        "employee/read/",
     ],
 )
 def test_read_empty(db_app_url: str, url: str):
-    response = requests.get(db_app_url + url, params={"ids": list(range(-10, 10))})
+    response = requests.get(db_app_url + url, params={"ids": list(range(1, 10))})
     assert response.status_code == 200
     assert len(response.json()) == 0
 
@@ -53,21 +55,72 @@ def test_for_processing_wrong_value(db_app_url: str, url: str, n: int):
 
 
 @pytest.mark.parametrize(
-    "text",
+    "json",
     [
-        "Россия - страна, где живет Дмитрий Медведев",
-        "В прошлые выходные в Москве прошли муниципальные выборы",
-        "Ненавижу работать по вечерам",
+        {"type": "kek"},
+        {"type": ""},
     ],
 )
-def test_text_addition(db_app_url: str, text: str):
-    response = requests.post(db_app_url + "text/add/", json={"text": text, "source": "vk"})
-    data = response.json()
+def test_chat_wrong_input(db_app_url: str, json: Dict[str, Any]):
+    response = requests.post(db_app_url + "chat/add", json=json)
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize("type_", ["direct", "group", "comments"])
+def test_chat_addition(db_app_url: str, type_: str):
+    response = requests.post(db_app_url + "chat/add", json={"type": type_})
     assert response.status_code == 200
-    assert data["text"] == text
-    assert data["source"] == "vk"
-    assert "id" in data
-    assert "created_at" in data
+
+
+def test_chat_read(db_app_url: str):
+    response = requests.get(db_app_url + "chat/read", params={"ids": (1, 2, 3)})
+    assert response.status_code == 200
+    assert len(response.json()) == 3
+
+
+@pytest.mark.parametrize("passport", ["11111111", "22222222", "33333333"])
+def test_employee_addition(db_app_url: str, passport: str):
+    response = requests.post(
+        db_app_url + "employee/add",
+        json={"passport": passport, "first_name": "Oleg", "second_name": "Tinkoff", "department": "Director"},
+    )
+    assert response.status_code == 200
+
+
+def test_employee_read(db_app_url: str):
+    response = requests.get(db_app_url + "employee/read", params={"ids": (1, 2, 3)})
+    assert response.status_code == 200
+    assert len(response.json()) == 3
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"text": "Россия - страна, где живет Дмитрий Медведев", "source": "vk", "chat_id": 1, "employee_id": 1},
+        {
+            "text": "В прошлые выходные в Москве прошли муниципальные выборы",
+            "source": "vk",
+            "chat_id": 2,
+            "employee_id": 2,
+        },
+        {"text": "Ненавижу работать по вечерам", "source": "vk", "chat_id": 3, "employee_id": 3},
+    ],
+)
+def test_text_addition(db_app_url: str, data: Dict[str, Any]):
+    response = requests.post(db_app_url + "text/add/", json=data)
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"text": "text", "source": "vk", "chat_id": 100, "employee_id": 1},
+        {"text": "text", "source": "vk", "chat_id": 2, "employee_id": 200},
+    ],
+)
+def test_text_wrong_ids(db_app_url: str, data: Dict[str, Any]):
+    response = requests.post(db_app_url + "text/add/", json=data)
+    assert response.status_code == 404
 
 
 @pytest.mark.parametrize(
