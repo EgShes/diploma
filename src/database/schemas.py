@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, conint
 
 from src.database.models import EntityType, SentimentType
 
@@ -12,8 +12,9 @@ from src.database.models import EntityType, SentimentType
 class SourceTextBase(BaseModel):
     text: str
     source: str
-    employee_id: int
-    chat_id: int
+    employee_id: conint(gt=0)
+    chat_id: conint(gt=0)
+    published_at: Optional[datetime]
 
 
 class SourceTextCreate(SourceTextBase):
