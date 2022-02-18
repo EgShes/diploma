@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Any, Iterable, Optional, Tuple
 
 import pandas as pd
 import plotly.express as px
@@ -16,53 +16,57 @@ def init_connection():
     return psycopg2.connect(DbConfig.get_db_url())
 
 
-# TODO make it work with ids
-@st.cache(ttl=600)
-def get_ners(
-    user_id: Optional[int], chat_id: Optional[int], from_: datetime.datetime, till: datetime.datetime
-) -> pd.DataFrame:
-    # include last day
-    till = till + datetime.timedelta(days=1)
-    with connection.cursor() as cursor:
-        sql = """
+def form_sql(
+    employee_id: Optional[int], chat_id: Optional[int], from_: datetime.datetime, till: datetime.datetime
+) -> Tuple[str, Iterable[Any]]:
+    conditions, params = [], []
+    sql = """
         select
             ne.id as id,
-            ne.text as text,
             ne.type as type,
+            ne.text as text,
+            st.employee_id as employee_id,
+            st.chat_id as chat_id,
             ne.created_at as created_at,
             st.text as source_text
         from named_entity ne
             left join source_text st on st.id = ne.source_text_id
-        where ne.created_at >= %s and ne.created_at < %s;
-        """
-        cursor.execute(sql, [from_, till])
+            left join employee em on st.employee_id = em.id
+            left join chat ch on st.chat_id = ch.id"""
+    conditions.append("ne.created_at >= %s"), params.append(from_)
+    conditions.append("ne.created_at < %s"), params.append(till)
+    if employee_id is not None:
+        conditions.append("em.id = %s"), params.append(employee_id)
+    if chat_id is not None:
+        conditions.append("ch.id = %s"), params.append(chat_id)
+    sql += "\nwhere " + " and ".join(conditions) + ";"
+    return sql, params
+
+
+@st.cache(ttl=600)
+def get_ners(
+    employee_id: Optional[int], chat_id: Optional[int], from_: datetime.datetime, till: datetime.datetime
+) -> pd.DataFrame:
+    # include last day
+    till = till + datetime.timedelta(days=1)
+    with connection.cursor() as cursor:
+        sql, params = form_sql(employee_id, chat_id, from_, till)
+        cursor.execute(sql, params)
         data = cursor.fetchall()
-        df = pd.DataFrame.from_records(data, columns=["id", "text", "type", "created_at", "source_text"])
+        df = pd.DataFrame.from_records(
+            data, columns=["id", "text", "type", "employee_id", "chat_id", "created_at", "source_text"]
+        )
         return df
 
 
-def main():
+def main(
+    employee_id: Optional[int], chat_id: Optional[int], from_date: datetime.datetime, till_date: datetime.datetime
+):
 
     global connection
     connection = init_connection()
 
-    st.sidebar.markdown("## Параметры")
-    search_type = st.sidebar.selectbox("Область поиска", ["Везде", "Беседа", "Пользователь"])
-    user_id = st.sidebar.number_input("id пользователя", min_value=1, step=1, disabled=search_type != "Пользователь")
-    chat_id = st.sidebar.number_input("id беседы", min_value=1, step=1, disabled=search_type != "Беседа")
-
-    user_id = user_id if search_type == "Пользователь" else None
-    chat_id = chat_id if search_type == "Беседа" else None
-
-    st.sidebar.markdown("Даты поиска")
-    from_date = st.sidebar.date_input("С")
-    till_date = st.sidebar.date_input("По")
-
-    if till_date < from_date:
-        st.error("Дата начала поиска не может быть больше даты окончания")
-        return
-
-    ner_df = get_ners(user_id, chat_id, from_date, till_date)
+    ner_df = get_ners(employee_id, chat_id, from_date, till_date)
 
     st.dataframe(ner_df)
 
